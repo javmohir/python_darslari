@@ -1,0 +1,1691 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/javmohir/python_darslari/blob/main/cut_qcut.method\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pandas as pd\n",
+        "import numpy as np"
+      ],
+      "metadata": {
+        "id": "hCSL33dhI1fR"
+      },
+      "execution_count": 46,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df1 = pd.read_csv('https://raw.githubusercontent.com/anvarnarz/praktikum_datasets/main/world_population_duplicates.csv', index_col='country')\n",
+        "df1.head()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 238
+        },
+        "id": "8WKrhjB8JEgy",
+        "outputId": "d29f5249-514f-494b-94de-3903924ba4d8"
+      },
+      "execution_count": 47,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "         rank     density   densityMi    pop2021   area\n",
+              "country                                                \n",
+              "Macau       1  21946.4667  56841.3487    658.394     30\n",
+              "Monaco      2  19755.5000  51166.7450     39.511      2\n",
+              "Burundi    28    440.3044   1140.3884  12255.433  27834\n",
+              "Macau       1  21946.4667  56841.3487    658.394     30\n",
+              "Monaco      2  19755.5000  51166.7450     39.511      2"
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-ef2656ee-5998-4ecd-82d1-586992226445\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>rank</th>\n",
+              "      <th>density</th>\n",
+              "      <th>densityMi</th>\n",
+              "      <th>pop2021</th>\n",
+              "      <th>area</th>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>country</th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>Macau</th>\n",
+              "      <td>1</td>\n",
+              "      <td>21946.4667</td>\n",
+              "      <td>56841.3487</td>\n",
+              "      <td>658.394</td>\n",
+              "      <td>30</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Monaco</th>\n",
+              "      <td>2</td>\n",
+              "      <td>19755.5000</td>\n",
+              "      <td>51166.7450</td>\n",
+              "      <td>39.511</td>\n",
+              "      <td>2</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Burundi</th>\n",
+              "      <td>28</td>\n",
+              "      <td>440.3044</td>\n",
+              "      <td>1140.3884</td>\n",
+              "      <td>12255.433</td>\n",
+              "      <td>27834</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Macau</th>\n",
+              "      <td>1</td>\n",
+              "      <td>21946.4667</td>\n",
+              "      <td>56841.3487</td>\n",
+              "      <td>658.394</td>\n",
+              "      <td>30</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Monaco</th>\n",
+              "      <td>2</td>\n",
+              "      <td>19755.5000</td>\n",
+              "      <td>51166.7450</td>\n",
+              "      <td>39.511</td>\n",
+              "      <td>2</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-ef2656ee-5998-4ecd-82d1-586992226445')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-ef2656ee-5998-4ecd-82d1-586992226445 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-ef2656ee-5998-4ecd-82d1-586992226445');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 47
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df2 = pd.read_csv('https://raw.githubusercontent.com/anvarnarz/praktikum_datasets/main/world_population_duplicates.csv',\n",
+        "                  usecols=['country','pop2021','area'], index_col='country')\n",
+        "df1.head()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 238
+        },
+        "id": "DO1W6Nadgcdr",
+        "outputId": "f83f1191-8c6e-4aa6-8958-899039aba92f"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "           pop2021   area\n",
+              "country                  \n",
+              "Macau      658.394     30\n",
+              "Monaco      39.511      2\n",
+              "Burundi  12255.433  27834\n",
+              "Macau      658.394     30\n",
+              "Monaco      39.511      2"
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-1b2d34e7-c38d-49a6-b4d1-66682cf85a88\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>pop2021</th>\n",
+              "      <th>area</th>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>country</th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>Macau</th>\n",
+              "      <td>658.394</td>\n",
+              "      <td>30</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Monaco</th>\n",
+              "      <td>39.511</td>\n",
+              "      <td>2</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Burundi</th>\n",
+              "      <td>12255.433</td>\n",
+              "      <td>27834</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Macau</th>\n",
+              "      <td>658.394</td>\n",
+              "      <td>30</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Monaco</th>\n",
+              "      <td>39.511</td>\n",
+              "      <td>2</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-1b2d34e7-c38d-49a6-b4d1-66682cf85a88')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-1b2d34e7-c38d-49a6-b4d1-66682cf85a88 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-1b2d34e7-c38d-49a6-b4d1-66682cf85a88');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 3
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df2.loc['Uzbekistan']"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "J1zCq-UGYADD",
+        "outputId": "348ca70e-e5f2-40a2-8a7e-cf25045f6ccd"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "pop2021     33935.763\n",
+              "area       447400.000\n",
+              "Name: Uzbekistan, dtype: float64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 5
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df2.loc['India']"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "kcVBTWAMYIqi",
+        "outputId": "11df1dd2-30fc-4fad-8d66-2cb6da473376"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "pop2021    1393409.038\n",
+              "area       3287590.000\n",
+              "Name: India, dtype: float64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 6
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "BIQbwjlqYaYw"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Ahamiyat bering, aholi soni minglarda berilgan, bu degani aniq qiymatni topish uchun ko'rsatilgan qiymatni 1000 ga ko'paytirasiz. Ya'ni, O'zbekiston aholisi 33935 ko'rsatilgan, demak aholi soni 33935x1000=33milloin 935ming\n",
+        "\n",
+        "Keling, quyidagi oraliqlarda nechtadan davlat borligini tahlil qilamiz:\n",
+        "\n",
+        "1 milliongacha (0-1000)\n",
+        "1-10mln oraqlida (1000-10000)\n",
+        "10-30mln oraliqda (10000-30000)\n",
+        "30-50mln oraliqda (30000-50000)\n",
+        "50-100mln (50000-10000)\n",
+        "100-300mln (100000-300000)\n",
+        "300mln-1.5mlrd (300000-1500000)\n",
+        "Buning uchun quydagi bin (nuqtalarni) yaratib olamiz:"
+      ],
+      "metadata": {
+        "id": "geAnYFBZYk-A"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "bins = [0, 1000, 10000, 30000, 50000, 100000, 300000, 1500000]"
+      ],
+      "metadata": {
+        "id": "o1b_MMawZRJ_"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "population=df2.pop2021"
+      ],
+      "metadata": {
+        "id": "HgBUvnqMZqCR"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "population"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "PapD--JTZ873",
+        "outputId": "396a3b5d-97d3-44d1-c778-9d1d490f13d1"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "country\n",
+              "Macau                 658.394\n",
+              "Monaco                 39.511\n",
+              "Burundi             12255.433\n",
+              "Macau                 658.394\n",
+              "Monaco                 39.511\n",
+              "                      ...    \n",
+              "Namibia              2587.344\n",
+              "Western Sahara        611.875\n",
+              "Mongolia             3329.289\n",
+              "Falkland Islands        3.533\n",
+              "Greenland              56.877\n",
+              "Name: pop2021, Length: 247, dtype: float64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 12
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "guruh=pd.cut(population, bins)\n",
+        "guruh"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "p7iaPsqsaP89",
+        "outputId": "680e9f80-2e8c-4ac7-9ab5-fdc31000298f"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "country\n",
+              "Macau                    (0, 1000]\n",
+              "Monaco                   (0, 1000]\n",
+              "Burundi             (10000, 30000]\n",
+              "Macau                    (0, 1000]\n",
+              "Monaco                   (0, 1000]\n",
+              "                         ...      \n",
+              "Namibia              (1000, 10000]\n",
+              "Western Sahara           (0, 1000]\n",
+              "Mongolia             (1000, 10000]\n",
+              "Falkland Islands         (0, 1000]\n",
+              "Greenland                (0, 1000]\n",
+              "Name: pop2021, Length: 247, dtype: category\n",
+              "Categories (7, interval[int64, right]): [(0, 1000] < (1000, 10000] < (10000, 30000] <\n",
+              "                                         (30000, 50000] < (50000, 100000] < (100000, 300000] <\n",
+              "                                         (300000, 1500000]]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 15
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df2['guruh']=guruh\n",
+        "df2"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 455
+        },
+        "id": "iKS6gKekaxWI",
+        "outputId": "fefe9d7e-2174-48df-a0a1-e9be619aa7a3"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "                    pop2021     area           guruh\n",
+              "country                                             \n",
+              "Macau               658.394       30       (0, 1000]\n",
+              "Monaco               39.511        2       (0, 1000]\n",
+              "Burundi           12255.433    27834  (10000, 30000]\n",
+              "Macau               658.394       30       (0, 1000]\n",
+              "Monaco               39.511        2       (0, 1000]\n",
+              "...                     ...      ...             ...\n",
+              "Namibia            2587.344   825615   (1000, 10000]\n",
+              "Western Sahara      611.875   266000       (0, 1000]\n",
+              "Mongolia           3329.289  1564110   (1000, 10000]\n",
+              "Falkland Islands      3.533    12173       (0, 1000]\n",
+              "Greenland            56.877  2166086       (0, 1000]\n",
+              "\n",
+              "[247 rows x 3 columns]"
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-61665122-d978-41a1-bc7e-5546bd6140b9\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>pop2021</th>\n",
+              "      <th>area</th>\n",
+              "      <th>guruh</th>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>country</th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>Macau</th>\n",
+              "      <td>658.394</td>\n",
+              "      <td>30</td>\n",
+              "      <td>(0, 1000]</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Monaco</th>\n",
+              "      <td>39.511</td>\n",
+              "      <td>2</td>\n",
+              "      <td>(0, 1000]</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Burundi</th>\n",
+              "      <td>12255.433</td>\n",
+              "      <td>27834</td>\n",
+              "      <td>(10000, 30000]</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Macau</th>\n",
+              "      <td>658.394</td>\n",
+              "      <td>30</td>\n",
+              "      <td>(0, 1000]</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Monaco</th>\n",
+              "      <td>39.511</td>\n",
+              "      <td>2</td>\n",
+              "      <td>(0, 1000]</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>...</th>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Namibia</th>\n",
+              "      <td>2587.344</td>\n",
+              "      <td>825615</td>\n",
+              "      <td>(1000, 10000]</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Western Sahara</th>\n",
+              "      <td>611.875</td>\n",
+              "      <td>266000</td>\n",
+              "      <td>(0, 1000]</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Mongolia</th>\n",
+              "      <td>3329.289</td>\n",
+              "      <td>1564110</td>\n",
+              "      <td>(1000, 10000]</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Falkland Islands</th>\n",
+              "      <td>3.533</td>\n",
+              "      <td>12173</td>\n",
+              "      <td>(0, 1000]</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Greenland</th>\n",
+              "      <td>56.877</td>\n",
+              "      <td>2166086</td>\n",
+              "      <td>(0, 1000]</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "<p>247 rows × 3 columns</p>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-61665122-d978-41a1-bc7e-5546bd6140b9')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-61665122-d978-41a1-bc7e-5546bd6140b9 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-61665122-d978-41a1-bc7e-5546bd6140b9');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 16
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "guruh.value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "l8wJ_2H6bjWJ",
+        "outputId": "9e4992cd-75c7-4360-f74e-f2eeab0e013a"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(0, 1000]            80\n",
+              "(1000, 10000]        73\n",
+              "(10000, 30000]       46\n",
+              "(30000, 50000]       19\n",
+              "(50000, 100000]      15\n",
+              "(100000, 300000]     11\n",
+              "(300000, 1500000]     3\n",
+              "Name: pop2021, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 17
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = pd.read_csv(\"https://github.com/anvarnarz/praktikum_datasets/raw/main/automobile_data.csv\", index_col=0)\n",
+        "df.head()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 238
+        },
+        "id": "xXnnj-uHceM_",
+        "outputId": "ce037dc7-6d9e-42ea-cb25-afcf7defde86"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "           company   body-style  wheel-base  length engine-type  \\\n",
+              "index                                                             \n",
+              "0      alfa-romero  convertible        88.6   168.8        dohc   \n",
+              "1      alfa-romero  convertible        88.6   168.8        dohc   \n",
+              "2      alfa-romero    hatchback        94.5   171.2        ohcv   \n",
+              "3             audi        sedan        99.8   176.6         ohc   \n",
+              "4             audi        sedan        99.4   176.6         ohc   \n",
+              "\n",
+              "      num-of-cylinders  horsepower  average-mileage    price  \n",
+              "index                                                         \n",
+              "0                 four         111               21  13495.0  \n",
+              "1                 four         111               21  16500.0  \n",
+              "2                  six         154               19  16500.0  \n",
+              "3                 four         102               24  13950.0  \n",
+              "4                 five         115               18  17450.0  "
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-a9892d9c-3533-4997-b64c-d272bb313807\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>company</th>\n",
+              "      <th>body-style</th>\n",
+              "      <th>wheel-base</th>\n",
+              "      <th>length</th>\n",
+              "      <th>engine-type</th>\n",
+              "      <th>num-of-cylinders</th>\n",
+              "      <th>horsepower</th>\n",
+              "      <th>average-mileage</th>\n",
+              "      <th>price</th>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>index</th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>alfa-romero</td>\n",
+              "      <td>convertible</td>\n",
+              "      <td>88.6</td>\n",
+              "      <td>168.8</td>\n",
+              "      <td>dohc</td>\n",
+              "      <td>four</td>\n",
+              "      <td>111</td>\n",
+              "      <td>21</td>\n",
+              "      <td>13495.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>alfa-romero</td>\n",
+              "      <td>convertible</td>\n",
+              "      <td>88.6</td>\n",
+              "      <td>168.8</td>\n",
+              "      <td>dohc</td>\n",
+              "      <td>four</td>\n",
+              "      <td>111</td>\n",
+              "      <td>21</td>\n",
+              "      <td>16500.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>alfa-romero</td>\n",
+              "      <td>hatchback</td>\n",
+              "      <td>94.5</td>\n",
+              "      <td>171.2</td>\n",
+              "      <td>ohcv</td>\n",
+              "      <td>six</td>\n",
+              "      <td>154</td>\n",
+              "      <td>19</td>\n",
+              "      <td>16500.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>audi</td>\n",
+              "      <td>sedan</td>\n",
+              "      <td>99.8</td>\n",
+              "      <td>176.6</td>\n",
+              "      <td>ohc</td>\n",
+              "      <td>four</td>\n",
+              "      <td>102</td>\n",
+              "      <td>24</td>\n",
+              "      <td>13950.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>audi</td>\n",
+              "      <td>sedan</td>\n",
+              "      <td>99.4</td>\n",
+              "      <td>176.6</td>\n",
+              "      <td>ohc</td>\n",
+              "      <td>five</td>\n",
+              "      <td>115</td>\n",
+              "      <td>18</td>\n",
+              "      <td>17450.0</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-a9892d9c-3533-4997-b64c-d272bb313807')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-a9892d9c-3533-4997-b64c-d272bb313807 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-a9892d9c-3533-4997-b64c-d272bb313807');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 22
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.price.describe()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "gvO3y48dcvxe",
+        "outputId": "acac00ab-8814-4180-b0cb-a52c8ee16b35"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "count       58.000000\n",
+              "mean     15387.000000\n",
+              "std      11320.259841\n",
+              "min       5151.000000\n",
+              "25%       6808.500000\n",
+              "50%      11095.000000\n",
+              "75%      18120.500000\n",
+              "max      45400.000000\n",
+              "Name: price, dtype: float64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 23
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "bins=[0, 10000, 20000, 50000]"
+      ],
+      "metadata": {
+        "id": "Jy3vNXdIdDDH"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "range=pd.cut(df.price, bins)\n",
+        "range"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "UT7-Th63dyr0",
+        "outputId": "19836522-0d39-4bd6-f9fe-66fe5325fa3d"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "index\n",
+              "0     (10000, 20000]\n",
+              "1     (10000, 20000]\n",
+              "2     (10000, 20000]\n",
+              "3     (10000, 20000]\n",
+              "4     (10000, 20000]\n",
+              "           ...      \n",
+              "81        (0, 10000]\n",
+              "82        (0, 10000]\n",
+              "86        (0, 10000]\n",
+              "87    (10000, 20000]\n",
+              "88    (10000, 20000]\n",
+              "Name: price, Length: 61, dtype: category\n",
+              "Categories (3, interval[int64, right]): [(0, 10000] < (10000, 20000] < (20000, 50000]]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 32
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "range.value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "3IdObHkUd8Q4",
+        "outputId": "8498939c-eab9-44f8-c8cd-683c39fcbf02"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(0, 10000]        28\n",
+              "(10000, 20000]    17\n",
+              "(20000, 50000]    13\n",
+              "Name: price, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 33
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "names=['past', 'o\\'rta', 'yuqori']\n",
+        "range=pd.cut(df.price, bins, labels=names)\n",
+        "range.value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "1WTGAwdkeWhR",
+        "outputId": "b8c600a8-f7f8-4cff-9aff-771abed43823"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "past      28\n",
+              "o'rta     17\n",
+              "yuqori    13\n",
+              "Name: price, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 34
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['oraliq']=range\n",
+        "df"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 455
+        },
+        "id": "ouVCmxhyf_QE",
+        "outputId": "79b7f141-6c7e-47f0-9ec3-4b0f8f57bfa6"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "           company   body-style  wheel-base  length engine-type  \\\n",
+              "index                                                             \n",
+              "0      alfa-romero  convertible        88.6   168.8        dohc   \n",
+              "1      alfa-romero  convertible        88.6   168.8        dohc   \n",
+              "2      alfa-romero    hatchback        94.5   171.2        ohcv   \n",
+              "3             audi        sedan        99.8   176.6         ohc   \n",
+              "4             audi        sedan        99.4   176.6         ohc   \n",
+              "...            ...          ...         ...     ...         ...   \n",
+              "81      volkswagen        sedan        97.3   171.7         ohc   \n",
+              "82      volkswagen        sedan        97.3   171.7         ohc   \n",
+              "86      volkswagen        sedan        97.3   171.7         ohc   \n",
+              "87           volvo        sedan       104.3   188.8         ohc   \n",
+              "88           volvo        wagon       104.3   188.8         ohc   \n",
+              "\n",
+              "      num-of-cylinders  horsepower  average-mileage    price  names  orliq  \\\n",
+              "index                                                                        \n",
+              "0                 four         111               21  13495.0  o'rta  o'rta   \n",
+              "1                 four         111               21  16500.0  o'rta  o'rta   \n",
+              "2                  six         154               19  16500.0  o'rta  o'rta   \n",
+              "3                 four         102               24  13950.0  o'rta  o'rta   \n",
+              "4                 five         115               18  17450.0  o'rta  o'rta   \n",
+              "...                ...         ...              ...      ...    ...    ...   \n",
+              "81                four          85               27   7975.0   past   past   \n",
+              "82                four          52               37   7995.0   past   past   \n",
+              "86                four         100               26   9995.0   past   past   \n",
+              "87                four         114               23  12940.0  o'rta  o'rta   \n",
+              "88                four         114               23  13415.0  o'rta  o'rta   \n",
+              "\n",
+              "      oraliq  \n",
+              "index         \n",
+              "0      o'rta  \n",
+              "1      o'rta  \n",
+              "2      o'rta  \n",
+              "3      o'rta  \n",
+              "4      o'rta  \n",
+              "...      ...  \n",
+              "81      past  \n",
+              "82      past  \n",
+              "86      past  \n",
+              "87     o'rta  \n",
+              "88     o'rta  \n",
+              "\n",
+              "[61 rows x 12 columns]"
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-d21c6080-1e9b-4e16-843f-a81756e5a4a8\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>company</th>\n",
+              "      <th>body-style</th>\n",
+              "      <th>wheel-base</th>\n",
+              "      <th>length</th>\n",
+              "      <th>engine-type</th>\n",
+              "      <th>num-of-cylinders</th>\n",
+              "      <th>horsepower</th>\n",
+              "      <th>average-mileage</th>\n",
+              "      <th>price</th>\n",
+              "      <th>names</th>\n",
+              "      <th>orliq</th>\n",
+              "      <th>oraliq</th>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>index</th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>alfa-romero</td>\n",
+              "      <td>convertible</td>\n",
+              "      <td>88.6</td>\n",
+              "      <td>168.8</td>\n",
+              "      <td>dohc</td>\n",
+              "      <td>four</td>\n",
+              "      <td>111</td>\n",
+              "      <td>21</td>\n",
+              "      <td>13495.0</td>\n",
+              "      <td>o'rta</td>\n",
+              "      <td>o'rta</td>\n",
+              "      <td>o'rta</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>alfa-romero</td>\n",
+              "      <td>convertible</td>\n",
+              "      <td>88.6</td>\n",
+              "      <td>168.8</td>\n",
+              "      <td>dohc</td>\n",
+              "      <td>four</td>\n",
+              "      <td>111</td>\n",
+              "      <td>21</td>\n",
+              "      <td>16500.0</td>\n",
+              "      <td>o'rta</td>\n",
+              "      <td>o'rta</td>\n",
+              "      <td>o'rta</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>alfa-romero</td>\n",
+              "      <td>hatchback</td>\n",
+              "      <td>94.5</td>\n",
+              "      <td>171.2</td>\n",
+              "      <td>ohcv</td>\n",
+              "      <td>six</td>\n",
+              "      <td>154</td>\n",
+              "      <td>19</td>\n",
+              "      <td>16500.0</td>\n",
+              "      <td>o'rta</td>\n",
+              "      <td>o'rta</td>\n",
+              "      <td>o'rta</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>audi</td>\n",
+              "      <td>sedan</td>\n",
+              "      <td>99.8</td>\n",
+              "      <td>176.6</td>\n",
+              "      <td>ohc</td>\n",
+              "      <td>four</td>\n",
+              "      <td>102</td>\n",
+              "      <td>24</td>\n",
+              "      <td>13950.0</td>\n",
+              "      <td>o'rta</td>\n",
+              "      <td>o'rta</td>\n",
+              "      <td>o'rta</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>audi</td>\n",
+              "      <td>sedan</td>\n",
+              "      <td>99.4</td>\n",
+              "      <td>176.6</td>\n",
+              "      <td>ohc</td>\n",
+              "      <td>five</td>\n",
+              "      <td>115</td>\n",
+              "      <td>18</td>\n",
+              "      <td>17450.0</td>\n",
+              "      <td>o'rta</td>\n",
+              "      <td>o'rta</td>\n",
+              "      <td>o'rta</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>...</th>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "      <td>...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>81</th>\n",
+              "      <td>volkswagen</td>\n",
+              "      <td>sedan</td>\n",
+              "      <td>97.3</td>\n",
+              "      <td>171.7</td>\n",
+              "      <td>ohc</td>\n",
+              "      <td>four</td>\n",
+              "      <td>85</td>\n",
+              "      <td>27</td>\n",
+              "      <td>7975.0</td>\n",
+              "      <td>past</td>\n",
+              "      <td>past</td>\n",
+              "      <td>past</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>82</th>\n",
+              "      <td>volkswagen</td>\n",
+              "      <td>sedan</td>\n",
+              "      <td>97.3</td>\n",
+              "      <td>171.7</td>\n",
+              "      <td>ohc</td>\n",
+              "      <td>four</td>\n",
+              "      <td>52</td>\n",
+              "      <td>37</td>\n",
+              "      <td>7995.0</td>\n",
+              "      <td>past</td>\n",
+              "      <td>past</td>\n",
+              "      <td>past</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>86</th>\n",
+              "      <td>volkswagen</td>\n",
+              "      <td>sedan</td>\n",
+              "      <td>97.3</td>\n",
+              "      <td>171.7</td>\n",
+              "      <td>ohc</td>\n",
+              "      <td>four</td>\n",
+              "      <td>100</td>\n",
+              "      <td>26</td>\n",
+              "      <td>9995.0</td>\n",
+              "      <td>past</td>\n",
+              "      <td>past</td>\n",
+              "      <td>past</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>87</th>\n",
+              "      <td>volvo</td>\n",
+              "      <td>sedan</td>\n",
+              "      <td>104.3</td>\n",
+              "      <td>188.8</td>\n",
+              "      <td>ohc</td>\n",
+              "      <td>four</td>\n",
+              "      <td>114</td>\n",
+              "      <td>23</td>\n",
+              "      <td>12940.0</td>\n",
+              "      <td>o'rta</td>\n",
+              "      <td>o'rta</td>\n",
+              "      <td>o'rta</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>88</th>\n",
+              "      <td>volvo</td>\n",
+              "      <td>wagon</td>\n",
+              "      <td>104.3</td>\n",
+              "      <td>188.8</td>\n",
+              "      <td>ohc</td>\n",
+              "      <td>four</td>\n",
+              "      <td>114</td>\n",
+              "      <td>23</td>\n",
+              "      <td>13415.0</td>\n",
+              "      <td>o'rta</td>\n",
+              "      <td>o'rta</td>\n",
+              "      <td>o'rta</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "<p>61 rows × 12 columns</p>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-d21c6080-1e9b-4e16-843f-a81756e5a4a8')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-d21c6080-1e9b-4e16-843f-a81756e5a4a8 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-d21c6080-1e9b-4e16-843f-a81756e5a4a8');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 41
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "ajr=pd.cut(df.price, 5)\n",
+        "ajr.value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "jTk3JdjDhLxW",
+        "outputId": "e533420e-6783-42f2-d3d9-6481e61256eb"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(5110.751, 13200.8]    32\n",
+              "(13200.8, 21250.6]     14\n",
+              "(29300.4, 37350.2]      7\n",
+              "(37350.2, 45400.0]      3\n",
+              "(21250.6, 29300.4]      2\n",
+              "Name: price, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 44
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "ajr=pd.qcut(df.horsepower, 3)\n",
+        "ajr.value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "2n4Rk34TjD8B",
+        "outputId": "eb639034-cf63-429e-efad-6836c6df7d14"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(47.999, 70.0]    24\n",
+              "(111.0, 288.0]    20\n",
+              "(70.0, 111.0]     17\n",
+              "Name: horsepower, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 45
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "ajr=pd.qcut(df.price, 3)\n",
+        "ajr.value_counts()"
+      ],
+      "metadata": {
+        "id": "yAp5fwW8kJRF",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "0d45540c-adb3-487c-aa87-b508986cfdc4"
+      },
+      "execution_count": 48,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(5150.999, 7295.0]    20\n",
+              "(7295.0, 16430.0]     19\n",
+              "(16430.0, 45400.0]    19\n",
+              "Name: price, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 48
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "kShds-QUkX2I"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ],
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyMED0ha6kj/Bsn5s1bhN7e5",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "display_name": "Python 3",
+      "name": "python3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 0
+}
