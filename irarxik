@@ -1,0 +1,383 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "private_outputs": true,
+      "provenance": [],
+      "authorship_tag": "ABX9TyNAQykbCxwR2J/cfWaKFuH9",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    },
+    "gpuClass": "standard"
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/javmohir/python_darslari/blob/main/irarxik\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "9YvjE5bNVDWi"
+      },
+      "outputs": [],
+      "source": [
+        "import pandas as pd \n",
+        "import numpy as np\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!git clone https://github.com/MansurCompAI/Practicum_Datasets.git"
+      ],
+      "metadata": {
+        "id": "sFZxCV1uVOU7"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df=pd.read_csv(\"/content/Practicum_Datasets/world_cities_air_water_quality.csv\")"
+      ],
+      "metadata": {
+        "id": "SytMPGOZVob1"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "df.head()"
+      ],
+      "metadata": {
+        "id": "EC3kGnOMV1_v"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.info()"
+      ],
+      "metadata": {
+        "id": "288HlJ8XV5X4"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "columns=['City','Rigion','Country','AirQuality','WaterPollution']\n",
+        "df.columns=columns\n",
+        "df"
+      ],
+      "metadata": {
+        "id": "opwMHcEjWvEV"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['Rigion']=df['Rigion'].map(lambda x:x.replace('\"',\"\"))\n",
+        "df"
+      ],
+      "metadata": {
+        "id": "yr7JoXKtX5F4"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['Country']=df['Country'].map(lambda x: x.replace('\"',\" \"))\n",
+        "df"
+      ],
+      "metadata": {
+        "id": "nN7_KpBjZDGn"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.to_csv(\"Updated_dataset.csv\", index=False)"
+      ],
+      "metadata": {
+        "id": "e12NU_eRZeZL"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df[df['Country']=='Germany']"
+      ],
+      "metadata": {
+        "id": "SmiHp_wraNo-"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['Country'][2]"
+      ],
+      "metadata": {
+        "id": "g4Yf6AEoa-xC"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['Country']=df['Country'].map(lambda x: x.strip())"
+      ],
+      "metadata": {
+        "id": "U9ZpPwfobEI-"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['Country'][2]"
+      ],
+      "metadata": {
+        "id": "cZ7TW7_EbaWc"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df[df['Country']=='Germany']"
+      ],
+      "metadata": {
+        "id": "GyAtOEFlbjk8"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df[df['Country']=='Uzbekistan']"
+      ],
+      "metadata": {
+        "id": "3LGcs3Hnb3AT"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df1=pd.pivot_table(df, index=['Country','City'])\n",
+        "df1"
+      ],
+      "metadata": {
+        "id": "gKCD5kmEchjF"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.index"
+      ],
+      "metadata": {
+        "id": "EQ9Z9kXddev9"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df1.index"
+      ],
+      "metadata": {
+        "id": "VCH2_Ecud6Gu"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df1.loc['Uzbekistan']"
+      ],
+      "metadata": {
+        "id": "hTmmamfUeDq7"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df1.loc[['Uzbekistan','Germany','Tajikistan']]"
+      ],
+      "metadata": {
+        "id": "s_Wkrup9ebpV"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df2=df1.copy()\n",
+        "df2"
+      ],
+      "metadata": {
+        "id": "8mlN0UoKeu5A"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df2['AirPollution']=100-df2['AirQuality']\n",
+        "df2"
+      ],
+      "metadata": {
+        "id": "OUnben3gzPSI"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df2['WaterQuality']=100-df2['WaterPollution']\n",
+        "df2"
+      ],
+      "metadata": {
+        "id": "UNifxoY5z027"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df3=pd.DataFrame(df2.values, index=df2.index, columns=[['Air','Air','Water','Water'],['AirQuality','AirPollution','WaterQuality','WaterPollution']])\n",
+        "df3"
+      ],
+      "metadata": {
+        "id": "JRdMSVjH0aeG"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df3['Air']"
+      ],
+      "metadata": {
+        "id": "CwfaU0Lz18fG"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df3['Water']"
+      ],
+      "metadata": {
+        "id": "xL-5A2972XDs"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df3.columns.names=['objekt','info']\n",
+        "df3"
+      ],
+      "metadata": {
+        "id": "TWLIFhg42wJT"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df3.index.names"
+      ],
+      "metadata": {
+        "id": "wIS1Ys883ATM"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df3.swaplevel('Country','City')\n"
+      ],
+      "metadata": {
+        "id": "izguOPHQ3oTf"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df3.sort_index(level=0, ascending=False)"
+      ],
+      "metadata": {
+        "id": "kXD8LV_E5eYj"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "xUcg2g786028"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
